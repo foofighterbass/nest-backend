@@ -7,36 +7,36 @@ import { AuthGuard } from './guards/auth.guard';
 import { UsersEntity } from './users.entity';
 import { UsersService } from './users.service';
 
-@Controller()
+@Controller('user')
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
-    @Post('user/create')
+    @Post('create')
     @UsePipes(new ValidationPipe())
     async createUser(@Body('user') createUsersDto: CreateUsersDto): Promise<any> {
         const user = await this.usersService.createUser(createUsersDto);
         return this.usersService.buildUserResponse(user);
     }
 
-    @Post('user/login')
+    @Post('login')
     @UsePipes(new ValidationPipe())
     async loginUser(@Body('user') loginUsersDto: LoginUsersDto): Promise<any> {
         const user = await this.usersService.loginUser(loginUsersDto);
         return this.usersService.buildUserResponse(user);
     }
 
-    @Get('user')
+    @Get()
     @UseGuards(AuthGuard)
     async currentUser(@User() user: UsersEntity): Promise<any> {
         return this.usersService.buildUserResponse(user);
     }
 
-    @Put('user')
+    @Put()
     @UseGuards(AuthGuard)
     async updateUser(
         @User('id') currentUserId: number,
-        @Body('user') updateUsersDto: UpdateUsersDto
-    ): Promise<any> {
+        @Body('user') updateUsersDto: UpdateUsersDto): 
+    Promise<any> {
         const user = await this.usersService.updateUser(currentUserId, updateUsersDto);
         return this.usersService.buildUserResponse(user);
     }
