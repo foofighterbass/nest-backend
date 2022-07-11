@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { User } from 'src/users/decorators/users.decorator';
 import { AuthGuard } from 'src/users/guards/auth.guard';
 import { UsersEntity } from 'src/users/users.entity';
@@ -9,6 +9,11 @@ import { ProjectService } from './project.service';
 @Controller('project')
 export class ProjectController {
     constructor(private readonly projectService: ProjectService) {}
+
+    @Get()
+    async findAll(@Query() query: any): Promise<any> {
+        return await this.projectService.findAll(query);
+    }
 
     @Post()
     @UsePipes(new ValidationPipe)

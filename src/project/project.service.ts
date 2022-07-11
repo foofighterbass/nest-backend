@@ -6,12 +6,50 @@ import { CreateProjectDto } from './dto/createProject.dto';
 import { ProjectEntity } from './project.entity';
 import slugify from 'slugify';
 import { UpdateProjectDto } from './dto/updateProject.dto';
+import { AppDataSource } from 'src/AppDataSource'
 
 @Injectable()
 export class ProjectService {
-    constructor(@InjectRepository(ProjectEntity) 
-        private readonly projectRepository: Repository<ProjectEntity>
+    constructor(
+        @InjectRepository(ProjectEntity) 
+            private readonly projectRepository: Repository<ProjectEntity>,
+        @InjectRepository(UsersEntity) 
+            private readonly usersRepository: Repository<UsersEntity>
     ) {}
+
+    async findAll(query: any): Promise<any> {
+        const queryBuilder = AppDataSource
+            .getRepository(ProjectEntity)
+            .createQueryBuilder('projects')
+            .leftJoinAndSelect('projects.author', 'author');
+
+        queryBuilder.orderBy('projects.createdAt', 'DESC');
+
+        const projectsCount = await queryBuilder.getCount();
+
+        if (query.author) {
+            const author = await this.usersRepository.findOneBy({
+                name: query.author
+            });
+            if (!author) {
+                throw new HttpException('Projects of user not found', HttpStatus.NOT_FOUND)
+            }
+            queryBuilder.andWhere('projects.author.id = :id', {
+                id: author.id
+            })
+        }
+
+        if (query.limit) {
+            queryBuilder.limit(query.limit);
+        }
+
+        if (query.offset) {
+            queryBuilder.offset(query.offset);
+        }
+
+        const projects = await queryBuilder.getMany();
+        return { projects, projectsCount}
+    }
 
     async createProject(currentUser: UsersEntity, createProjectDto: CreateProjectDto): Promise<any> {
         const newProject = new ProjectEntity;
