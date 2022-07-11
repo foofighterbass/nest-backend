@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersEntity } from 'src/users/users.entity';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { CreateProjectDto } from './dto/createProject.dto';
 import { ProjectEntity } from './project.entity';
 import slugify from 'slugify';
@@ -21,6 +21,22 @@ export class ProjectService {
         return await this.projectRepository.save(newProject);
     }
 
+    async findBySlug(slug: string): Promise<any> {
+        return this.projectRepository.findOneBy({slug});
+    }
+
+    async deleteProject(currentUserId: number, slug: string): Promise<DeleteResult> {
+        const project = await this.findBySlug(slug);
+        
+        if (!project) {
+            throw new HttpException('Project does not exist', HttpStatus.NOT_FOUND);
+        }
+        if (project.author.id !== currentUserId) {
+            throw new HttpException('You are not an author', HttpStatus.FORBIDDEN);
+        }
+        return await this.projectRepository.delete({ slug })
+    }
+ 
     buildProjectResponse(project: ProjectEntity) {
         return { project  }
     }
