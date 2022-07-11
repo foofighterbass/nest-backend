@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthMiddleware } from './users/middlewares/auth.middleware';
 import { UsersModule } from './users/users.module';
+import { ProjectModule } from './project/project.module';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { UsersModule } from './users/users.module';
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
-    UsersModule
+    UsersModule,
+    ProjectModule
   ],
   controllers: [],
   providers: [],
