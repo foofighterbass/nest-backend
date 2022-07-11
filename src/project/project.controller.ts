@@ -16,6 +16,7 @@ export class ProjectController {
         @User() currentUser: UsersEntity,
         @Body('project') createProjectDto: CreateProjectDto): 
     Promise<any> {
-        return this.projectService.createProject(currentUser, createProjectDto);
+        const project = await this.projectService.createProject(currentUser, createProjectDto);
+        return this.projectService.buildProjectResponse(project);
     }
 }
