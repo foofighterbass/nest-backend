@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { User } from 'src/users/decorators/users.decorator';
 import { AuthGuard } from 'src/users/guards/auth.guard';
 import { UsersEntity } from 'src/users/users.entity';
 import { CreateProjectDto } from './dto/createProject.dto';
+import { UpdateProjectDto } from './dto/updateProject.dto';
 import { ProjectService } from './project.service';
 
 @Controller('project')
@@ -33,5 +34,17 @@ export class ProjectController {
         @Param('slug') slug: string): 
     Promise<any> {
         return await this.projectService.deleteProject(currentUserId, slug);
+    }
+
+    @Put(':slug')
+    @UsePipes(new ValidationPipe)
+    @UseGuards(AuthGuard)
+    async updateProject(
+        @User('id') currentUserId: number,
+        @Body('project') updateProjectDto: UpdateProjectDto,
+        @Param('slug') slug: string): 
+    Promise<any> {
+        const project = await this.projectService.updateProject(currentUserId, updateProjectDto, slug);
+        return this.projectService.buildProjectResponse(project);
     }
 }

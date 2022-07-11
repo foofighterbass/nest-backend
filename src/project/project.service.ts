@@ -5,6 +5,7 @@ import { DeleteResult, Repository } from 'typeorm';
 import { CreateProjectDto } from './dto/createProject.dto';
 import { ProjectEntity } from './project.entity';
 import slugify from 'slugify';
+import { UpdateProjectDto } from './dto/updateProject.dto';
 
 @Injectable()
 export class ProjectService {
@@ -27,7 +28,7 @@ export class ProjectService {
 
     async deleteProject(currentUserId: number, slug: string): Promise<DeleteResult> {
         const project = await this.findBySlug(slug);
-        
+
         if (!project) {
             throw new HttpException('Project does not exist', HttpStatus.NOT_FOUND);
         }
@@ -35,6 +36,23 @@ export class ProjectService {
             throw new HttpException('You are not an author', HttpStatus.FORBIDDEN);
         }
         return await this.projectRepository.delete({ slug })
+    }
+
+    async updateProject(
+        currentUserId: number, 
+        updateProjectDto: UpdateProjectDto, 
+        slug: string): 
+    Promise<any> {
+        const project = await this.findBySlug(slug);
+
+        if (!project) {
+            throw new HttpException('Project does not exist', HttpStatus.NOT_FOUND);
+        }
+        if (project.author.id !== currentUserId) {
+            throw new HttpException('You are not an author', HttpStatus.FORBIDDEN);
+        }
+        Object.assign(project, updateProjectDto);
+        return await this.projectRepository.save(project);
     }
  
     buildProjectResponse(project: ProjectEntity) {
