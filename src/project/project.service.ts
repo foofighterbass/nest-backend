@@ -60,7 +60,23 @@ export class ProjectService {
         return await this.projectRepository.save(newProject);
     }
 
-    async findBySlug(slug: string): Promise<any> {
+    async newUserToProject(email: string, slug: string): Promise<any> {
+        const project = this.findBySlug(slug);
+        const user = await this.usersRepository.findOneBy({email});
+        (await project).users = [user]
+
+        const search = user.id;
+        const userId = (await project).users.find(man => man.id === search);
+        if (userId) {
+            return project
+        }
+        else {
+            return 'ты дурак'
+        }
+        
+    }
+
+    async findBySlug(slug: string) {
         return this.projectRepository.findOneBy({slug});
     }
 

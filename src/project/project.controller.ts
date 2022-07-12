@@ -52,5 +52,14 @@ export class ProjectController {
         const project = await this.projectService.updateProject(currentUserId, updateProjectDto, slug);
         return this.projectService.buildProjectResponse(project);
     }
-    
+   
+    @Post(':slug/new-user')
+    @UsePipes(new ValidationPipe)
+    @UseGuards(AuthGuard)
+    async newUserToProject(
+        @Body('email') email: string,
+        @Param('slug') slug: string): 
+    Promise<any> {
+        return await this.projectService.newUserToProject(email, slug);
+    }
 }

@@ -1,5 +1,5 @@
 import { ProjectEntity } from "src/project/project.entity";
-import { BeforeInsert, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name: 'users'})
 export class UsersEntity {
@@ -21,4 +21,7 @@ export class UsersEntity {
 
     @OneToMany(() => ProjectEntity, project => project.author)
     projects: ProjectEntity[];
+
+    @ManyToMany(() => ProjectEntity, (usersProjects) => usersProjects.users)
+    usersProjects: ProjectEntity[]
 }

@@ -1,5 +1,5 @@
 import { UsersEntity } from "src/users/users.entity";
-import { BeforeUpdate, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeUpdate, Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name: 'projects'})
 export class ProjectEntity {
@@ -34,4 +34,8 @@ export class ProjectEntity {
 
     @ManyToOne(() => UsersEntity, user => user.projects, {eager: true})
     author: UsersEntity;
+
+    @ManyToMany(() => UsersEntity, (users) => users.usersProjects)
+    @JoinTable()
+    users: UsersEntity[];
 }
