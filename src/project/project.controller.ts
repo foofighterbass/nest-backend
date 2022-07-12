@@ -52,4 +52,5 @@ export class ProjectController {
         const project = await this.projectService.updateProject(currentUserId, updateProjectDto, slug);
         return this.projectService.buildProjectResponse(project);
     }
+    
 }
