@@ -9,29 +9,34 @@ import { UsersService } from './user.service';
 
 @Controller('user')
 export class UsersController {
+
     constructor(private readonly usersService: UsersService) {}
 
-    @Post('create')
+
+    @Post('create')//create user
     @UsePipes(new ValidationPipe())
     async createUser(@Body('user') createUsersDto: CreateUsersDto): Promise<any> {
         const user = await this.usersService.createUser(createUsersDto);
         return this.usersService.buildUserResponse(user);
     }
 
-    @Post('login')
+
+    @Post('login')//login user
     @UsePipes(new ValidationPipe())
     async loginUser(@Body('user') loginUsersDto: LoginUsersDto): Promise<any> {
         const user = await this.usersService.loginUser(loginUsersDto);
         return this.usersService.buildUserResponse(user);
     }
 
-    @Get()
+
+    @Get()//get current user
     @UseGuards(AuthGuard)
     async currentUser(@User() user: UserEntity): Promise<any> {
         return this.usersService.buildUserResponse(user);
     }
 
-    @Put()
+    
+    @Put()//update user fields
     @UseGuards(AuthGuard)
     async updateUser(
         @User('id') currentUserId: number,

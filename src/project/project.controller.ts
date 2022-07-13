@@ -8,14 +8,11 @@ import { ProjectService } from './project.service';
 
 @Controller('project')
 export class ProjectController {
+
     constructor(private readonly projectService: ProjectService) {}
 
-    @Get()
-    async findAll(@Query() query: any): Promise<any> {
-        return await this.projectService.findAll(query);
-    }
 
-    @Post()
+    @Post('create')//create new project
     @UsePipes(new ValidationPipe)
     @UseGuards(AuthGuard)
     async createProject(
@@ -26,22 +23,25 @@ export class ProjectController {
         return this.projectService.buildProjectResponse(project);
     }
 
-    @Get(':slug')
+
+    @Get(':slug')//find one project by slug
     async getSingleProject(@Param('slug') slug: string): Promise<any> {
         const project = await this.projectService.findBySlug(slug);
         return this.projectService.buildProjectResponse(project);
     }
 
-    @Delete(':slug')
+
+    @Delete(':slug')//delete one project by slug
     @UseGuards(AuthGuard)
-    async deleteArticle(
+    async deleteProject(
         @User('id') currentUserId: number,
         @Param('slug') slug: string): 
     Promise<any> {
         return await this.projectService.deleteProject(currentUserId, slug);
     }
 
-    @Put(':slug')
+
+    @Put(':slug')//update one project by slug
     @UsePipes(new ValidationPipe)
     @UseGuards(AuthGuard)
     async updateProject(
@@ -52,14 +52,21 @@ export class ProjectController {
         const project = await this.projectService.updateProject(currentUserId, updateProjectDto, slug);
         return this.projectService.buildProjectResponse(project);
     }
+
+    
+    @Get()//all projects
+    async findAll(@Query() query: any): Promise<any> {
+        return await this.projectService.findAll(query);
+    }
    
-    @Post(':slug/new-user')
+
+    @Post(':slug/addmember')//add member to project
     @UsePipes(new ValidationPipe)
     @UseGuards(AuthGuard)
-    async newUserToProject(
+    async addMember(
         @Body('email') email: string,
         @Param('slug') slug: string): 
     Promise<any> {
-        return await this.projectService.newUserToProject(email, slug);
+        return await this.projectService.addMember(email, slug);
     }
 }
