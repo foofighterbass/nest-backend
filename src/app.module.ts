@@ -4,6 +4,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthMiddleware } from './user/middlewares/auth.middleware';
 import { UsersModule } from './user/user.module';
 import { ProjectModule } from './project/project.module';
+import { GroupModule } from './group/group.module';
+import { TaskModule } from './task/task.module';
+import { SubtaskModule } from './subtask/subtask.module';
 
 @Module({
   imports: [
@@ -21,7 +24,10 @@ import { ProjectModule } from './project/project.module';
       synchronize: true,
     }),
     UsersModule,
-    ProjectModule
+    ProjectModule,
+    GroupModule,
+    TaskModule,
+    SubtaskModule
   ],
   controllers: [],
   providers: [],

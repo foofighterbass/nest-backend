@@ -14,27 +14,27 @@ export class ProjectService {
         @InjectRepository(ProjectEntity) 
             private readonly projectRepository: Repository<ProjectEntity>,
         @InjectRepository(UserEntity) 
-            private readonly usersRepository: Repository<UserEntity>
+            private readonly userRepository: Repository<UserEntity>
     ) {}
 
     async findAll(query: any): Promise<any> {
         const queryBuilder = AppDataSource
             .getRepository(ProjectEntity)
             .createQueryBuilder('projects')
-            .leftJoinAndSelect('projects.author', 'author');
+            .leftJoinAndSelect('projects.authorOfProject', 'author');
 
         queryBuilder.orderBy('projects.createdAt', 'DESC');
 
         const projectsCount = await queryBuilder.getCount();
 
         if (query.author) {
-            const author = await this.usersRepository.findOneBy({
+            const author = await this.userRepository.findOneBy({
                 name: query.author
             });
             if (!author) {
                 throw new HttpException('Projects of user not found', HttpStatus.NOT_FOUND)
             }
-            queryBuilder.andWhere('projects.author.id = :id', {
+            queryBuilder.andWhere('projects.authorOfProject.id = :id', {
                 id: author.id
             })
         }
@@ -54,21 +54,26 @@ export class ProjectService {
     async createProject(currentUser: UserEntity, createProjectDto: CreateProjectDto): Promise<any> {
         const newProject = new ProjectEntity;
         Object.assign(newProject, createProjectDto);
-        newProject.author = currentUser;
+        newProject.authorOfProject = currentUser;
         newProject.slug = this.getSlug(createProjectDto.title)
 
         return await this.projectRepository.save(newProject);
     }
 
     async newUserToProject(email: string, slug: string): Promise<any> {
+        const queryBuilder = AppDataSource
+            .getRepository(ProjectEntity)
+            .createQueryBuilder('projects')
+            .leftJoinAndSelect('projects.membersOfProject', 'members');
+
         const project = this.findBySlug(slug);
-        const user = await this.usersRepository.findOneBy({email});
-        (await project).users = [user]
+        const user = await this.userRepository.findOneBy({email});
+        (await project).membersOfProject = [user]
 
         const search = user.id;
-        const userId = (await project).users.find(man => man.id === search);
+        const userId = (await project).membersOfProject.find(man => man.id === search);
         if (userId) {
-            return project
+            return  await queryBuilder.getMany();
         }
         else {
             return 'ты дурак'
@@ -86,7 +91,7 @@ export class ProjectService {
         if (!project) {
             throw new HttpException('Project does not exist', HttpStatus.NOT_FOUND);
         }
-        if (project.author.id !== currentUserId) {
+        if (project.authorOfProject.id !== currentUserId) {
             throw new HttpException('You are not an author', HttpStatus.FORBIDDEN);
         }
         return await this.projectRepository.delete({ slug })
@@ -102,7 +107,7 @@ export class ProjectService {
         if (!project) {
             throw new HttpException('Project does not exist', HttpStatus.NOT_FOUND);
         }
-        if (project.author.id !== currentUserId) {
+        if (project.authorOfProject.id !== currentUserId) {
             throw new HttpException('You are not an author', HttpStatus.FORBIDDEN);
         }
         Object.assign(project, updateProjectDto);

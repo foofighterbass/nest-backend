@@ -1,5 +1,7 @@
+import { GroupEntity } from "src/group/group.entity";
 import { ProjectEntity } from "src/project/project.entity";
-import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { TaskEntity } from "src/task/task.entity";
+import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name: 'users'})
 export class UserEntity {
@@ -19,9 +21,15 @@ export class UserEntity {
     @Column({select: false})
     password: string;
 
-    @OneToMany(() => ProjectEntity, project => project.author)
-    projects: ProjectEntity[];
+    @OneToMany(() => ProjectEntity, (projects) => projects.authorOfProject)
+    projectsAuthor: ProjectEntity[];
 
-    @ManyToMany(() => ProjectEntity, (usersProjects) => usersProjects.users)
-    usersProjects: ProjectEntity[]
+    @ManyToMany(() => ProjectEntity, (projects) => projects.membersOfProject)
+    projectsMember: ProjectEntity[];
+
+    @ManyToMany(() => GroupEntity, (groups) => groups.membersOfGroup)
+    groupsMember: GroupEntity[];
+
+    @ManyToMany(() => TaskEntity, (tasks) => tasks.membersOfTask)
+    tasksMember: GroupEntity[];
 }

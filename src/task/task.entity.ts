@@ -1,9 +1,10 @@
 import { GroupEntity } from "src/group/group.entity";
+import { SubtaskEntity } from "src/subtask/subtask.entity";
 import { UserEntity } from "src/user/user.entity";
 import { BeforeUpdate, Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity({name: 'projects'})
-export class ProjectEntity {
+@Entity({name: 'tasks'})
+export class TaskEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -33,13 +34,13 @@ export class ProjectEntity {
         this.updatedAt = new Date;
     }
 
-    @ManyToOne(() => UserEntity, (author) => author.projectsAuthor, {eager: true})
-    authorOfProject: UserEntity;
+    @ManyToOne(() => GroupEntity, (group) => group.tasksOfGroup)
+    groupOfTasks: GroupEntity;
 
-    @ManyToMany(() => UserEntity, (members) => members.projectsMember)
+    @ManyToMany(() => UserEntity, (members) => members.tasksMember)
     @JoinTable()
-    membersOfProject: UserEntity[];
+    membersOfTask: UserEntity[];
 
-    @OneToMany(() => GroupEntity, (groups) => groups.projectOfGroup)
-    groupsOfProject: GroupEntity[];
+    @OneToMany(() => SubtaskEntity, (subtasks) => subtasks.taskOfSubtasks)
+    subtasksOfTask: SubtaskEntity[];
 }
