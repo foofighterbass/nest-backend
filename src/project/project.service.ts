@@ -99,6 +99,7 @@ export class ProjectService {
     async addMember(email: string, slug: string): Promise<any> {
         const project = await this.findBySlug(slug);
         const user = await this.userRepository.findOneBy({email});
+        project.membersOfProject = [user]
         //const userId = project.membersOfProject.find(man => man.id === user.id);
         console.log(user)
         /*const queryBuilder = await AppDataSource
