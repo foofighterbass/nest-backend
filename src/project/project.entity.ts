@@ -1,4 +1,4 @@
-import { UsersEntity } from "src/users/users.entity";
+import { UserEntity } from "src/user/user.entity";
 import { BeforeUpdate, Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name: 'projects'})
@@ -32,10 +32,10 @@ export class ProjectEntity {
         this.updatedAt = new Date;
     }
 
-    @ManyToOne(() => UsersEntity, user => user.projects, {eager: true})
-    author: UsersEntity;
+    @ManyToOne(() => UserEntity, user => user.projects, {eager: true})
+    author: UserEntity;
 
-    @ManyToMany(() => UsersEntity, (users) => users.usersProjects)
+    @ManyToMany(() => UserEntity, (users) => users.usersProjects)
     @JoinTable()
-    users: UsersEntity[];
+    users: UserEntity[];
 }

@@ -1,8 +1,8 @@
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthMiddleware } from './users/middlewares/auth.middleware';
-import { UsersModule } from './users/users.module';
+import { AuthMiddleware } from './user/middlewares/auth.middleware';
+import { UsersModule } from './user/user.module';
 import { ProjectModule } from './project/project.module';
 
 @Module({

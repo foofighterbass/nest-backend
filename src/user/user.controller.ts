@@ -4,8 +4,8 @@ import { CreateUsersDto } from './dto/createUsers.dto';
 import { LoginUsersDto } from './dto/loginUsers.dto';
 import { UpdateUsersDto } from './dto/updateUsers.dto';
 import { AuthGuard } from './guards/auth.guard';
-import { UsersEntity } from './users.entity';
-import { UsersService } from './users.service';
+import { UserEntity } from './user.entity';
+import { UsersService } from './user.service';
 
 @Controller('user')
 export class UsersController {
@@ -27,7 +27,7 @@ export class UsersController {
 
     @Get()
     @UseGuards(AuthGuard)
-    async currentUser(@User() user: UsersEntity): Promise<any> {
+    async currentUser(@User() user: UserEntity): Promise<any> {
         return this.usersService.buildUserResponse(user);
     }
 

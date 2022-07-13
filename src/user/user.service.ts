@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUsersDto } from './dto/createUsers.dto';
-import { UsersEntity } from './users.entity';
+import { UserEntity } from './user.entity';
 import { sign } from 'jsonwebtoken';
 import { JWT_SECRET } from 'src/config';
 import { LoginUsersDto } from './dto/loginUsers.dto';
@@ -10,8 +10,8 @@ import { UpdateUsersDto } from './dto/updateUsers.dto';
 
 @Injectable()
 export class UsersService {
-    constructor(@InjectRepository(UsersEntity) 
-        private readonly usersRepository: Repository<UsersEntity>
+    constructor(@InjectRepository(UserEntity) 
+        private readonly usersRepository: Repository<UserEntity>
     ) {}
 
     async createUser(createUsersDto: CreateUsersDto): Promise<any> {
@@ -25,7 +25,7 @@ export class UsersService {
             throw new HttpException('Email or phone are taken', HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
-        const newUser = new UsersEntity;
+        const newUser = new UserEntity;
         Object.assign(newUser, createUsersDto);
         return await this.usersRepository.save(newUser);
     }
@@ -52,7 +52,7 @@ export class UsersService {
         return this.usersRepository.findOneBy({id});
     }
 
-    buildUserResponse(user: UsersEntity): any {
+    buildUserResponse(user: UserEntity): any {
         return {
             user: {
                 ...user,
@@ -61,7 +61,7 @@ export class UsersService {
         };
     }
 
-    generateJwt(user: UsersEntity): any {
+    generateJwt(user: UserEntity): any {
         return sign(
             {
                 id: user.id,

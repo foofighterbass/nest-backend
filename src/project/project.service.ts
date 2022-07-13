@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UsersEntity } from 'src/users/users.entity';
+import { UserEntity } from 'src/user/user.entity';
 import { DeleteResult, Repository } from 'typeorm';
 import { CreateProjectDto } from './dto/createProject.dto';
 import { ProjectEntity } from './project.entity';
@@ -13,8 +13,8 @@ export class ProjectService {
     constructor(
         @InjectRepository(ProjectEntity) 
             private readonly projectRepository: Repository<ProjectEntity>,
-        @InjectRepository(UsersEntity) 
-            private readonly usersRepository: Repository<UsersEntity>
+        @InjectRepository(UserEntity) 
+            private readonly usersRepository: Repository<UserEntity>
     ) {}
 
     async findAll(query: any): Promise<any> {
@@ -51,7 +51,7 @@ export class ProjectService {
         return { projects, projectsCount}
     }
 
-    async createProject(currentUser: UsersEntity, createProjectDto: CreateProjectDto): Promise<any> {
+    async createProject(currentUser: UserEntity, createProjectDto: CreateProjectDto): Promise<any> {
         const newProject = new ProjectEntity;
         Object.assign(newProject, createProjectDto);
         newProject.author = currentUser;

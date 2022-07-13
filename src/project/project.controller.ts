@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
-import { User } from 'src/users/decorators/users.decorator';
-import { AuthGuard } from 'src/users/guards/auth.guard';
-import { UsersEntity } from 'src/users/users.entity';
+import { User } from 'src/user/decorators/users.decorator';
+import { AuthGuard } from 'src/user/guards/auth.guard';
+import { UserEntity } from 'src/user/user.entity';
 import { CreateProjectDto } from './dto/createProject.dto';
 import { UpdateProjectDto } from './dto/updateProject.dto';
 import { ProjectService } from './project.service';
@@ -19,7 +19,7 @@ export class ProjectController {
     @UsePipes(new ValidationPipe)
     @UseGuards(AuthGuard)
     async createProject(
-        @User() currentUser: UsersEntity,
+        @User() currentUser: UserEntity,
         @Body('project') createProjectDto: CreateProjectDto): 
     Promise<any> {
         const project = await this.projectService.createProject(currentUser, createProjectDto);

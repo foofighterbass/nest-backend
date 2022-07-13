@@ -1,8 +1,8 @@
 import { ProjectEntity } from "src/project/project.entity";
-import { BeforeInsert, Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name: 'users'})
-export class UsersEntity {
+export class UserEntity {
     
     @PrimaryGeneratedColumn()
     id: number;
