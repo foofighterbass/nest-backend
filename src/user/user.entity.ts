@@ -29,7 +29,7 @@ export class UserEntity {
 
     @ManyToMany(() => GroupEntity, (groups) => groups.membersOfGroup)
     groupsMember: GroupEntity[];
-
+ 
     @ManyToMany(() => TaskEntity, (tasks) => tasks.membersOfTask)
     tasksMember: GroupEntity[];
 }

@@ -36,7 +36,9 @@ export class ProjectEntity {
     @ManyToOne(() => UserEntity, (author) => author.projectsAuthor, {eager: true})
     authorOfProject: UserEntity;
 
-    @ManyToMany(() => UserEntity, (members) => members.projectsMember)
+    @ManyToMany(() => UserEntity, (members) => members.projectsMember, {
+        cascade: true
+    })
     @JoinTable()
     membersOfProject: UserEntity[];
 

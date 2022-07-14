@@ -10,9 +10,11 @@ import { UpdateUsersDto } from './dto/updateUsers.dto';
 
 @Injectable()
 export class UsersService {
+
     constructor(@InjectRepository(UserEntity) 
         private readonly usersRepository: Repository<UserEntity>
     ) {}
+
 
     async createUser(createUsersDto: CreateUsersDto): Promise<any> {
         const userByEmail = await this.usersRepository.findOneBy({
@@ -30,6 +32,7 @@ export class UsersService {
         return await this.usersRepository.save(newUser);
     }
 
+
     async loginUser(loginUsersDto: LoginUsersDto): Promise<any> {
         const user = await this.usersRepository.findOneBy({
             email: loginUsersDto.email,
@@ -42,15 +45,19 @@ export class UsersService {
         }
     }
 
+
+    findById(id: number): any {
+        return this.usersRepository.findOneBy({id});
+    }
+
+
     async updateUser(currentUserId: number, updateUsersDto: UpdateUsersDto): Promise<any> {
         const user = await this.findById(currentUserId);
         Object.assign(user, updateUsersDto);
         return await this.usersRepository.save(user);
     }
 
-    findById(id: number): any {
-        return this.usersRepository.findOneBy({id});
-    }
+    /* -------------- AUXILARY -------------- */
 
     buildUserResponse(user: UserEntity): any {
         return {

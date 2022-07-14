@@ -55,8 +55,8 @@ export class ProjectController {
 
     
     @Get()//all projects
-    async findAll(@Query() query: any): Promise<any> {
-        return await this.projectService.findAll(query);
+    async allProjects(@Query() query: any): Promise<any> {
+        return await this.projectService.allProjects(query);
     }
    
 
@@ -68,5 +68,14 @@ export class ProjectController {
         @Param('slug') slug: string): 
     Promise<any> {
         return await this.projectService.addMember(email, slug);
+    }
+
+
+    @Get(':slug/members')
+    @UseGuards(AuthGuard)
+    async allMembers(
+        @Param('slug') slug: string): 
+    Promise<any> {
+        return await this.projectService.allMembers(slug);
     }
 }

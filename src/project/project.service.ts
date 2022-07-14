@@ -1,12 +1,13 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/user/user.entity';
-import { DeleteResult, Repository } from 'typeorm';
+import { Any, DeleteResult, Repository } from 'typeorm';
 import { CreateProjectDto } from './dto/createProject.dto';
 import { ProjectEntity } from './project.entity';
 import slugify from 'slugify';
 import { UpdateProjectDto } from './dto/updateProject.dto';
 import { AppDataSource } from 'src/AppDataSource'
+
 
 @Injectable()
 export class ProjectService {
@@ -66,7 +67,7 @@ export class ProjectService {
     }
 
 
-    async findAll(query: any): Promise<any> {
+    async allProjects(query: any): Promise<any> {
         const queryBuilder = AppDataSource
             .getRepository(ProjectEntity)
             .createQueryBuilder('projects')
@@ -94,34 +95,33 @@ export class ProjectService {
         const projects = await queryBuilder.getMany();
         return { projects, projectsCount}
     }
-    
+
 
     async addMember(email: string, slug: string): Promise<any> {
+        
         const project = await this.findBySlug(slug);
-        const user = await this.userRepository.findOneBy({email});
-        project.membersOfProject = [user]
-        //const userId = project.membersOfProject.find(man => man.id === user.id);
-        console.log(user)
-        /*const queryBuilder = await AppDataSource
+        const member = await this.userRepository.findOneBy({email});
+
+        if (!member) {
+            throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+        }
+        project.membersOfProject = [member];
+        member.projectsMember = [project];
+        await this.userRepository.save(member);
+
+        return 'New member ' + member.name + ' added to project ' + project.title;
+    }
+
+
+    async allMembers(slugProject: string): Promise<any> {
+        const queryBuilder = AppDataSource
             .getRepository(ProjectEntity)
             .createQueryBuilder('projects')
-            .setParameter()
-            .execute()*/
-
-        //return project.membersOfProject.push(user)
+            .leftJoinAndSelect('projects.membersOfProject', 'members')
+            .where('projects.slug = :slug', { slug: slugProject });
         
-        
-        
-        //(await project).membersOfProject = [user]
-
-        
-        /*if (userId) {
-            return (await project).membersOfProject
-        }
-        else {
-            return 'ты дурак'
-        }*/
-        
+            const members = await queryBuilder.getMany();
+            return members;
     }
 
     /* -------------- AUXILARY -------------- */
