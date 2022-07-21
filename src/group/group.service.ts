@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import slugify from 'slugify';
 import { AppDataSource } from 'src/AppDataSource';
@@ -34,8 +34,27 @@ export class GroupService {
         return newGroup
     }
 
+
+    async findGroup(query: any): Promise<any> {
+        const queryBuilder = AppDataSource
+            .getRepository(GroupEntity)
+            .createQueryBuilder('groups')
+            .leftJoinAndSelect('groups.authorOfGroup', 'author')
+            //.where('groups.projectOfGroup = :project', { project: project });
+        
+        if (query.id) {
+            const group = await this.groupRepository.findOneBy({
+                id: query.id
+            });
+            if (!group) {
+                throw new HttpException('Group not found', HttpStatus.NOT_FOUND);
+            }
+            return group;
+        }
+    }
+
+
     async allProjects(slug: string): Promise<any> {
-        const project = await this.findBySlug(slug);
         const queryBuilder = AppDataSource
             .getRepository(GroupEntity)
             .createQueryBuilder('groups')
@@ -45,6 +64,37 @@ export class GroupService {
             const groups = await queryBuilder.getMany();
 
             return {groups}
+    }
+
+
+    async addMember(email: string, query: any): Promise<any> {
+        const group = await this.findGroup(query);
+        const member = await this.userRepository.findOneBy({email});
+
+        if (!member) {
+            throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+        }
+
+        console.log(group)
+
+        group.membersOfGroup = [member];
+        member.groupsMember = [group];
+        await this.userRepository.save(member);
+        return 'ok';
+    }
+
+
+    async allMembers(query: any): Promise<any> {
+        const queryBuilder = AppDataSource
+            .getRepository(GroupEntity)
+            .createQueryBuilder('groups')
+            .leftJoinAndSelect('groups.membersOfGroup', 'members')
+            .where('groups.id = :id', { id: query.id });
+        
+            //const membersCount = await queryBuilder.getCount();
+            const members = await queryBuilder.getOne();
+            
+            return members.membersOfGroup;
     }
 
     /* -------------- AUXILARY -------------- */

@@ -106,6 +106,8 @@ export class ProjectService {
         if (!member) {
             throw new HttpException('User not found', HttpStatus.NOT_FOUND);
         }
+
+        console.log(project)
         project.membersOfProject = [member];
         member.projectsMember = [project];
         await this.userRepository.save(member);
@@ -121,7 +123,7 @@ export class ProjectService {
             .leftJoinAndSelect('projects.membersOfProject', 'members')
             .where('projects.slug = :slug', { slug: slugProject });
         
-            const membersCount = await queryBuilder.getCount();
+            //const membersCount = await queryBuilder.getCount();
             const members = await queryBuilder.getOne();
             
             return members.membersOfProject;

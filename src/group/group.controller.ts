@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { User } from 'src/user/decorators/users.decorator';
 import { AuthGuard } from 'src/user/guards/auth.guard';
 import { UserEntity } from 'src/user/user.entity';
@@ -24,8 +24,35 @@ export class GroupController {
     }
 
 
+    @Get()
+    async findGroup(@Query() query: any): Promise<any> {
+        const group = await this.groupService.findGroup(query)
+        return await this.groupService.buildGroupResponse(group);
+    }
+
+
     @Get('list/:slug')
     async allGroups(@Param('slug') slug: string): Promise<any> {
         return await this.groupService.allProjects(slug);
+    }
+
+
+    @Post()
+    @UsePipes(new ValidationPipe)
+    @UseGuards(AuthGuard)
+    async addMember(
+        @Body('email') email: string,
+        @Query() query: any): 
+    Promise<any> {
+        return await this.groupService.addMember(email, query)
+    }
+
+
+    @Get('members')
+    @UseGuards(AuthGuard)
+    async allMembers(
+        @Query() query: any):
+    Promise<any> {
+        return await this.groupService.allMembers(query);
     }
 }
