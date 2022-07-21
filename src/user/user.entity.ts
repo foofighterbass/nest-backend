@@ -24,6 +24,9 @@ export class UserEntity {
     @OneToMany(() => ProjectEntity, (projects) => projects.authorOfProject)
     projectsAuthor: ProjectEntity[];
 
+    @OneToMany(() => GroupEntity, (groups) => groups.authorOfGroup)
+    groupsAuthor: ProjectEntity[];
+
     @ManyToMany(() => ProjectEntity, (projects) => projects.membersOfProject)
     projectsMember: ProjectEntity[];
 

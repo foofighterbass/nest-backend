@@ -21,7 +21,7 @@ export class ProjectEntity {
 
     @Column({default: 0})
     status: number;
-
+ 
     @Column({type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
     createdAt: Date;
 

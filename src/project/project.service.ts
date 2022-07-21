@@ -1,12 +1,13 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/user/user.entity';
-import { Any, DeleteResult, Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { CreateProjectDto } from './dto/createProject.dto';
 import { ProjectEntity } from './project.entity';
 import slugify from 'slugify';
 import { UpdateProjectDto } from './dto/updateProject.dto';
 import { AppDataSource } from 'src/AppDataSource'
+import { toJSON } from 'flatted';
 
 
 @Injectable()
@@ -30,7 +31,7 @@ export class ProjectService {
         return await this.projectRepository.save(newProject);
     }
 
-
+ 
     async findBySlug(slug: string) {
         return this.projectRepository.findOneBy({slug});
     }
@@ -97,9 +98,9 @@ export class ProjectService {
     }
 
 
-    async addMember(email: string, slug: string): Promise<any> {
+    async addMember(email: string, slugProject: string): Promise<any> {
         
-        const project = await this.findBySlug(slug);
+        const project = await this.findBySlug(slugProject);
         const member = await this.userRepository.findOneBy({email});
 
         if (!member) {
@@ -109,10 +110,10 @@ export class ProjectService {
         member.projectsMember = [project];
         await this.userRepository.save(member);
 
-        return 'New member ' + member.name + ' added to project ' + project.title;
+        return 'ok';
     }
 
-
+ 
     async allMembers(slugProject: string): Promise<any> {
         const queryBuilder = AppDataSource
             .getRepository(ProjectEntity)
@@ -120,14 +121,21 @@ export class ProjectService {
             .leftJoinAndSelect('projects.membersOfProject', 'members')
             .where('projects.slug = :slug', { slug: slugProject });
         
-            const members = await queryBuilder.getMany();
-            return members;
+            const membersCount = await queryBuilder.getCount();
+            const members = await queryBuilder.getOne();
+            
+            return members.membersOfProject;
+    }
+
+
+    async memeberProject(slug: string): Promise<any> {
+
     }
 
     /* -------------- AUXILARY -------------- */
 
     buildProjectResponse(project: ProjectEntity) {
-        return { project  }
+        return { project }
     }
 
 

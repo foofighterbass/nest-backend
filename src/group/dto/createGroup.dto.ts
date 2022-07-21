@@ -1,6 +1,6 @@
 import { IsDateString, IsNotEmpty } from "class-validator";
 
-export class CreateProjectDto {
+export class CreateGroupDto {
 
     @IsNotEmpty()
     readonly title: string;
@@ -10,5 +10,5 @@ export class CreateProjectDto {
 
     @IsDateString()
     readonly due: Date;
-    
+
 }

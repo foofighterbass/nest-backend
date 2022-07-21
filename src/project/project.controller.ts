@@ -8,10 +8,10 @@ import { ProjectService } from './project.service';
 
 @Controller('project')
 export class ProjectController {
-
+ 
     constructor(private readonly projectService: ProjectService) {}
 
-
+ 
     @Post('create')//create new project
     @UsePipes(new ValidationPipe)
     @UseGuards(AuthGuard)
@@ -59,8 +59,8 @@ export class ProjectController {
         return await this.projectService.allProjects(query);
     }
    
-
-    @Post(':slug/addmember')//add member to project
+ 
+    @Post('addmember/:slug')//add member to project
     @UsePipes(new ValidationPipe)
     @UseGuards(AuthGuard)
     async addMember(
@@ -71,11 +71,20 @@ export class ProjectController {
     }
 
 
-    @Get(':slug/members')
+    @Get('members/:slug')
     @UseGuards(AuthGuard)
     async allMembers(
         @Param('slug') slug: string): 
     Promise<any> {
         return await this.projectService.allMembers(slug);
+    }
+
+
+    @Get('member/:slug')
+    @UseGuards(AuthGuard)
+    async memberProject(
+        @Param('slug') slug: string): 
+    Promise<any> {
+        return await this.projectService.memeberProject(slug);
     }
 }

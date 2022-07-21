@@ -9,11 +9,8 @@ export class GroupEntity {
     id: number;
 
     @Column()
-    slug: string;
-
-    @Column()
     title: string;
-
+ 
     @Column()
     description: string;
 
@@ -33,6 +30,9 @@ export class GroupEntity {
     updateTimestamp() {
         this.updatedAt = new Date;
     }
+
+    @ManyToOne(() => UserEntity, (author) => author.groupsAuthor, {eager: true})
+    authorOfGroup: UserEntity;
 
     @ManyToOne(() => ProjectEntity, (projects) => projects.groupsOfProject, {eager: true})
     projectOfGroup: ProjectEntity;
