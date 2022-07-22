@@ -33,12 +33,11 @@ export class GroupController {
 
     @Get('list/:slug')
     async allGroups(@Param('slug') slug: string): Promise<any> {
-        return await this.groupService.allProjects(slug);
+        return await this.groupService.allGroups(slug);
     }
 
 
     @Post()
-    @UsePipes(new ValidationPipe)
     @UseGuards(AuthGuard)
     async addMember(
         @Body('email') email: string,

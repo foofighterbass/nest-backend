@@ -27,6 +27,9 @@ export class UserEntity {
     @OneToMany(() => GroupEntity, (groups) => groups.authorOfGroup)
     groupsAuthor: ProjectEntity[];
 
+    @OneToMany(() => TaskEntity, (tasks) => tasks.authorOfTask)
+    tasksAuthor: ProjectEntity[];
+
     @ManyToMany(() => ProjectEntity, (projects) => projects.membersOfProject)
     projectsMember: ProjectEntity[];
 
@@ -34,5 +37,5 @@ export class UserEntity {
     groupsMember: GroupEntity[];
  
     @ManyToMany(() => TaskEntity, (tasks) => tasks.membersOfTask)
-    tasksMember: GroupEntity[];
+    tasksMember: TaskEntity[];
 }

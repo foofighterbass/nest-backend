@@ -36,11 +36,11 @@ export class GroupService {
 
 
     async findGroup(query: any): Promise<any> {
-        const queryBuilder = AppDataSource
+        /*const queryBuilder = AppDataSource
             .getRepository(GroupEntity)
             .createQueryBuilder('groups')
             .leftJoinAndSelect('groups.authorOfGroup', 'author')
-            //.where('groups.projectOfGroup = :project', { project: project });
+            //.where('groups.projectOfGroup = :project', { project: project });*/
         
         if (query.id) {
             const group = await this.groupRepository.findOneBy({
@@ -54,12 +54,14 @@ export class GroupService {
     }
 
 
-    async allProjects(slug: string): Promise<any> {
+    async allGroups(slug: string): Promise<any> {
+        const project = await this.findBySlug(slug);
+        //console.log(project.id)
         const queryBuilder = AppDataSource
             .getRepository(GroupEntity)
             .createQueryBuilder('groups')
             .leftJoinAndSelect('groups.authorOfGroup', 'author')
-            //.where('groups.projectOfGroup = :project', { project: project });
+            .where('groups.projectOfGroup.id = :project', { project: project.id });
 
             const groups = await queryBuilder.getMany();
 
@@ -74,8 +76,6 @@ export class GroupService {
         if (!member) {
             throw new HttpException('User not found', HttpStatus.NOT_FOUND);
         }
-
-        console.log(group)
 
         group.membersOfGroup = [member];
         member.groupsMember = [group];

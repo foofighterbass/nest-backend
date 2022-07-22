@@ -1,4 +1,5 @@
 import { GroupEntity } from "src/group/group.entity";
+import { TaskEntity } from "src/task/task.entity";
 import { UserEntity } from "src/user/user.entity";
 import { BeforeUpdate, Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
@@ -32,7 +33,7 @@ export class ProjectEntity {
     updateTimestamp() {
         this.updatedAt = new Date;
     }
-
+ 
     @ManyToOne(() => UserEntity, (author) => author.projectsAuthor, {eager: true})
     authorOfProject: UserEntity;
 
@@ -44,4 +45,7 @@ export class ProjectEntity {
 
     @OneToMany(() => GroupEntity, (groups) => groups.projectOfGroup)
     groupsOfProject: GroupEntity[];
+
+    @OneToMany(() => TaskEntity, (tasks) => tasks.projectOfTask)
+    tasksOfProject: TaskEntity[];
 }

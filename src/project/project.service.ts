@@ -63,6 +63,7 @@ export class ProjectService {
         if (project.authorOfProject.id !== currentUserId) {
             throw new HttpException('You are not an author', HttpStatus.FORBIDDEN);
         }
+        console.log(project)
         Object.assign(project, updateProjectDto);
         return await this.projectRepository.save(project);
     }
@@ -107,7 +108,6 @@ export class ProjectService {
             throw new HttpException('User not found', HttpStatus.NOT_FOUND);
         }
 
-        console.log(project)
         project.membersOfProject = [member];
         member.projectsMember = [project];
         await this.userRepository.save(member);
