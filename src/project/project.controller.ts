@@ -24,13 +24,6 @@ export class ProjectController {
     }
 
 
-    /*@Get(':slug')//find one project by slug
-    async getSingleProject(@Param('slug') slug: string): Promise<any> {
-        const project = await this.projectService.findBySlug(slug);
-        return this.projectService.buildProjectResponse(project);
-    }*/
-
-
     @Get()//find one project by slug
     async getSingleProject(@Query() query: any): Promise<any> {
         const project = await this.projectService.getSingleProject(query);
@@ -60,7 +53,7 @@ export class ProjectController {
         return this.projectService.buildProjectResponse(project);
     }
 
-    
+     
     @Get('all')//all projects
     async allProjects(@Query() query: any): Promise<any> {
         return await this.projectService.allProjects(query);
@@ -85,13 +78,4 @@ export class ProjectController {
     Promise<any> {
         return await this.projectService.allMembers(slug);
     }
-
-
-    /*@Get('member/:slug')
-    @UseGuards(AuthGuard)
-    async memberProject(
-        @Param('slug') slug: string): 
-    Promise<any> {
-        return await this.projectService.memeberProject(slug);
-    }*/
 }

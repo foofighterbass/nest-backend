@@ -46,6 +46,7 @@ export class GroupService {
             }
             return group;
         }
+        throw new HttpException('Group not found', HttpStatus.NOT_FOUND);
     }
 
 

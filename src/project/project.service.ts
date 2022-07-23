@@ -7,7 +7,7 @@ import { ProjectEntity } from './project.entity';
 import slugify from 'slugify';
 import { UpdateProjectDto } from './dto/updateProject.dto';
 import { AppDataSource } from 'src/AppDataSource'
-
+ 
 
 @Injectable()
 export class ProjectService {
@@ -129,10 +129,10 @@ export class ProjectService {
             .leftJoinAndSelect('projects.membersOfProject', 'members')
             .where('projects.slug = :slug', { slug: slug });
         
-            //const membersCount = await queryBuilder.getCount();
-            const members = await queryBuilder.getOne();
-            
-            return members.membersOfProject;
+        //const membersCount = await queryBuilder.getCount();
+        const members = await queryBuilder.getOne();
+        
+        return members.membersOfProject;
     }
 
     /* -------------- AUXILARY -------------- */

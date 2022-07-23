@@ -40,9 +40,8 @@ export class UsersService {
         });
         if (user) {
             return user;
-        }else{
-            throw new HttpException('Email or password are not correct ', HttpStatus.UNPROCESSABLE_ENTITY);
         }
+        throw new HttpException('Email or password are not correct ', HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
 

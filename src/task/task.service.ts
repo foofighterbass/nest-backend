@@ -63,6 +63,7 @@ export class TaskService {
             }
             return task;
         }
+        throw new HttpException('Task not found', HttpStatus.NOT_FOUND);
     }
 
 
