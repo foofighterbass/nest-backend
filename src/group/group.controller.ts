@@ -5,13 +5,13 @@ import { UserEntity } from 'src/user/user.entity';
 import { CreateGroupDto } from './dto/createGroup.dto';
 import { GroupService } from './group.service';
 
-@Controller('group')
+@Controller(':slug')
 export class GroupController {
 
     constructor(private readonly groupService: GroupService) {}
-
  
-    @Post('create/:slug')//create new group
+  
+    @Post('group/create')//create new group
     @UsePipes(new ValidationPipe)
     @UseGuards(AuthGuard)
     async createGroup(
@@ -24,34 +24,37 @@ export class GroupController {
     }
 
 
-    @Get()
+    @Get('group')
     async findGroup(@Query() query: any): Promise<any> {
         const group = await this.groupService.findGroup(query)
         return await this.groupService.buildGroupResponse(group);
     }
 
 
-    @Get('list/:slug')
-    async allGroups(@Param('slug') slug: string): Promise<any> {
+    @Get('group/all')
+    async allGroups(
+        @Param('slug') slug: string,
+        @Query() query: any): 
+    Promise<any> {
         return await this.groupService.allGroups(slug);
     }
 
 
-    @Post()
+    @Post(':groupid/addmember')
     @UseGuards(AuthGuard)
     async addMember(
         @Body('email') email: string,
-        @Query() query: any): 
+        @Param('groupid') groupId: string): 
     Promise<any> {
-        return await this.groupService.addMember(email, query)
+        return await this.groupService.addMember(email, groupId)
     }
 
 
-    @Get('members')
+    @Get(':groupid/members')
     @UseGuards(AuthGuard)
     async allMembers(
-        @Query() query: any):
+        @Param('groupid') groupId: string):
     Promise<any> {
-        return await this.groupService.allMembers(query);
+        return await this.groupService.allMembers(groupId);
     }
 }

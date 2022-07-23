@@ -30,18 +30,13 @@ export class GroupService {
         newGroup.projectOfGroup = project;
 
         await this.groupRepository.save(newGroup);
+        await this.addMember(newGroup.authorOfGroup.email, newGroup.id);
 
         return newGroup
     }
 
 
     async findGroup(query: any): Promise<any> {
-        /*const queryBuilder = AppDataSource
-            .getRepository(GroupEntity)
-            .createQueryBuilder('groups')
-            .leftJoinAndSelect('groups.authorOfGroup', 'author')
-            //.where('groups.projectOfGroup = :project', { project: project });*/
-        
         if (query.id) {
             const group = await this.groupRepository.findOneBy({
                 id: query.id
@@ -54,7 +49,7 @@ export class GroupService {
     }
 
 
-    async allGroups(slug: string): Promise<any> {
+    async allGroups(slug): Promise<any> {
         const project = await this.findBySlug(slug);
         //console.log(project.id)
         const queryBuilder = AppDataSource
@@ -63,14 +58,16 @@ export class GroupService {
             .leftJoinAndSelect('groups.authorOfGroup', 'author')
             .where('groups.projectOfGroup.id = :project', { project: project.id });
 
-            const groups = await queryBuilder.getMany();
+        const groups = await queryBuilder.getMany();
 
-            return {groups}
+        return {groups}
     }
 
 
-    async addMember(email: string, query: any): Promise<any> {
-        const group = await this.findGroup(query);
+    async addMember(email: string, groupId: any): Promise<any> {
+        const group = await this.groupRepository.findOneBy({
+            id: groupId
+        });
         const member = await this.userRepository.findOneBy({email});
 
         if (!member) {
@@ -84,22 +81,22 @@ export class GroupService {
     }
 
 
-    async allMembers(query: any): Promise<any> {
+    async allMembers(groupId): Promise<any> {
         const queryBuilder = AppDataSource
             .getRepository(GroupEntity)
             .createQueryBuilder('groups')
             .leftJoinAndSelect('groups.membersOfGroup', 'members')
-            .where('groups.id = :id', { id: query.id });
+            .where('groups.id = :id', { id: groupId });
         
-            //const membersCount = await queryBuilder.getCount();
-            const members = await queryBuilder.getOne();
+        //const membersCount = await queryBuilder.getCount();
+        const members = await queryBuilder.getOne();
             
-            return members.membersOfGroup;
+        return members.membersOfGroup;
     }
 
     /* -------------- AUXILARY -------------- */
 
-    async findBySlug(slug: string) {
+    async findBySlug(slug) {
         return this.projectRepository.findOneBy({slug});
     }
 

@@ -24,27 +24,31 @@ export class TaskService {
     ) {}
 
 
-    async createTask(currentUser: UserEntity, query, createTaskDto): Promise<any> {
-        if (query.group && query.project) {
-            const group = await this.groupRepository.findOneBy({
-                id: query.group
-            });
-            if (!group) {
-                throw new HttpException('Group not found', HttpStatus.NOT_FOUND);
-            }
-            const project = await this.findBySlug(query.project);
-            const newTask = new TaskEntity;
+    async createTask(
+        currentUser: UserEntity, 
+        slug, 
+        groupId, 
+        createTaskDto): 
+    Promise<any> {
+        const group = await this.groupRepository.findOneBy({
+            id: groupId
+        });
+        if (!group) {
+            throw new HttpException('Group not found', HttpStatus.NOT_FOUND);
+        }
+        const project = await this.findBySlug(slug);
+        const newTask = new TaskEntity;
 
-            Object.assign(newTask, createTaskDto);
-            newTask.authorOfTask = currentUser;
-            //project.groupsOfProject = [newGroup];
-            newTask.projectOfTask = project;
-            newTask.groupOfTasks = group;
+        Object.assign(newTask, createTaskDto);
+        newTask.authorOfTask = currentUser;
+        //project.groupsOfProject = [newGroup];
+        newTask.projectOfTask = project;
+        newTask.groupOfTasks = group;
 
-            await this.taskRepository.save(newTask);
+        await this.taskRepository.save(newTask);
+        await this.addMember(newTask.authorOfTask.email, newTask.id);
 
-            return newTask;
-        } 
+        return newTask;  
     }
 
 
@@ -62,10 +66,10 @@ export class TaskService {
     }
 
 
-    async allTasks(query): Promise<any> {
-        const project = await this.findBySlug(query.project);
+    async allTasks(slug, groupId): Promise<any> {
+        const project = await this.findBySlug(slug);
         const group = await this.groupRepository.findOneBy({
-            id: query.group
+            id: groupId
         });
         //console.log(group.id)
         const queryBuilder = AppDataSource
@@ -75,15 +79,15 @@ export class TaskService {
             .where('tasks.groupOfTasks.id = :group', { group: group.id })
             .andWhere('tasks.projectOfTask.id = :project', { project: project.id });
 
-            const tasks = await queryBuilder.getMany();
+        const tasks = await queryBuilder.getMany();
 
-            return {tasks}
+        return {tasks}
     }
 
 
-    async addMember(email: string, query: any): Promise<any> {
+    async addMember(email: string, taskId): Promise<any> {
         const task = await this.taskRepository.findOneBy({
-            id: query.task
+            id: taskId
         });
         const member = await this.userRepository.findOneBy({email});
 
@@ -98,27 +102,25 @@ export class TaskService {
     }
 
 
-    async allMembers(query: any): Promise<any> {
+    async allMembers(taskId): Promise<any> {
         const queryBuilder = AppDataSource
             .getRepository(TaskEntity)
             .createQueryBuilder('tasks')
             .leftJoinAndSelect('tasks.membersOfTask', 'members')
-            .where('tasks.id = :id', { id: query.id });
+            .where('tasks.id = :id', { id: taskId });
         
-            //const membersCount = await queryBuilder.getCount();
-            const members = await queryBuilder.getOne();
-            
-            return members.membersOfTask;
+        //const membersCount = await queryBuilder.getCount();
+        const members = await queryBuilder.getOne();
+        
+        return members.membersOfTask;
     }
 
 
-    async taskStatus(query, statusTaskDto: StatusTaskDto): Promise<any> {
+    async taskStatus(taskId, statusTaskDto: StatusTaskDto): Promise<any> {
         const task = await this.taskRepository.findOneBy({
-            id: query.task
+            id: taskId
         });
-
-        console.log(task)
-
+        //console.log(task)
         Object.assign(task, statusTaskDto);
 
         console.log(task.status)

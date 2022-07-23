@@ -24,9 +24,16 @@ export class ProjectController {
     }
 
 
-    @Get(':slug')//find one project by slug
+    /*@Get(':slug')//find one project by slug
     async getSingleProject(@Param('slug') slug: string): Promise<any> {
         const project = await this.projectService.findBySlug(slug);
+        return this.projectService.buildProjectResponse(project);
+    }*/
+
+
+    @Get()//find one project by slug
+    async getSingleProject(@Query() query: any): Promise<any> {
+        const project = await this.projectService.getSingleProject(query);
         return this.projectService.buildProjectResponse(project);
     }
 
@@ -54,13 +61,13 @@ export class ProjectController {
     }
 
     
-    @Get()//all projects
+    @Get('all')//all projects
     async allProjects(@Query() query: any): Promise<any> {
         return await this.projectService.allProjects(query);
     }
    
- 
-    @Post('addmember/:slug')//add member to project
+  
+    @Post(':slug/addmember')//add member to project
     @UsePipes(new ValidationPipe)
     @UseGuards(AuthGuard)
     async addMember(
@@ -71,7 +78,7 @@ export class ProjectController {
     }
 
 
-    @Get('members/:slug')
+    @Get(':slug/members')
     @UseGuards(AuthGuard)
     async allMembers(
         @Param('slug') slug: string): 
@@ -80,11 +87,11 @@ export class ProjectController {
     }
 
 
-    @Get('member/:slug')
+    /*@Get('member/:slug')
     @UseGuards(AuthGuard)
     async memberProject(
         @Param('slug') slug: string): 
     Promise<any> {
         return await this.projectService.memeberProject(slug);
-    }
+    }*/
 }

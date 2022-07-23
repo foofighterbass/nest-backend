@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { User } from 'src/user/decorators/users.decorator';
 import { AuthGuard } from 'src/user/guards/auth.guard';
 import { UserEntity } from 'src/user/user.entity';
@@ -6,63 +6,67 @@ import { CreateTaskDto } from './dto/createTask.dto';
 import { StatusTaskDto } from './dto/statusTask.dto';
 import { TaskService } from './task.service';
 
-@Controller('task')
+@Controller(':slug/:groupid')
 export class TaskController {
 
     constructor(private readonly taskService: TaskService) {}
 
 
-    @Post('create')//create new task
+    @Post('task/create')//create new task
     @UsePipes(new ValidationPipe)
     @UseGuards(AuthGuard)
     async createTask(
         @User() currentUser: UserEntity,
-        @Query() query: any,
+        @Param('slug') slug: string,
+        @Param('groupid') groupId: string,
         @Body('task') createTaskDto: CreateTaskDto): 
     Promise<any> {
-        const group = await this.taskService.createTask(currentUser, query, createTaskDto);
+        const group = await this.taskService.createTask(currentUser, slug, groupId, createTaskDto);
         return this.taskService.buildTaskResponse(group);
     }
 
 
-    @Get()
+    @Get('task')
     async findTask(@Query() query: any): Promise<any> {
         const group = await this.taskService.findTask(query)
         return await this.taskService.buildTaskResponse(group);
     }
 
 
-    @Get('list')
-    async allTasks(@Query() query: any): Promise<any> {
-        return await this.taskService.allTasks(query);
+    @Get('task/all')
+    async allTasks(
+        @Param('slug') slug: string,
+        @Param('groupid') groupId: string): 
+    Promise<any> {
+        return await this.taskService.allTasks(slug, groupId);
     }
 
 
-    @Post('addmember')
+    @Post(':taskid/addmember')
     @UseGuards(AuthGuard)
     async addMember(
         @Body('email') email: string,
-        @Query() query: any): 
+        @Param('taskid') taskId: string): 
     Promise<any> {
-        return await this.taskService.addMember(email, query)
+        return await this.taskService.addMember(email, taskId)
     }
+ 
 
-
-    @Get('members')
+    @Get(':taskid/allmembers')
     @UseGuards(AuthGuard)
     async allMembers(
-        @Query() query: any):
+        @Param('taskid') taskId: string):
     Promise<any> {
-        return await this.taskService.allMembers(query);
+        return await this.taskService.allMembers(taskId);
     }
 
 
-    @Post('status')
+    @Post(':taskid/chst')
     @UsePipes(new ValidationPipe)
     async taskStatus(
-        @Query() query: any,
+        @Param('taskid') taskId: string,
         @Body('task') statusTaskDto: StatusTaskDto): 
     Promise<any> {
-        return await this.taskService.taskStatus(query, statusTaskDto);
+        return await this.taskService.taskStatus(taskId, statusTaskDto);
     }
 }

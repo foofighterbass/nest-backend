@@ -7,7 +7,6 @@ import { ProjectEntity } from './project.entity';
 import slugify from 'slugify';
 import { UpdateProjectDto } from './dto/updateProject.dto';
 import { AppDataSource } from 'src/AppDataSource'
-import { toJSON } from 'flatted';
 
 
 @Injectable()
@@ -28,17 +27,20 @@ export class ProjectService {
         newProject.authorOfProject = currentUser;
         newProject.slug = this.getSlug(createProjectDto.title)
 
-        return await this.projectRepository.save(newProject);
+        await this.projectRepository.save(newProject);
+        await this.addMember(newProject.authorOfProject.email, newProject.slug);
+
+        return newProject;
     }
 
- 
-    async findBySlug(slug: string) {
-        return this.projectRepository.findOneBy({slug});
+
+    async getSingleProject(query) {
+        return this.projectRepository.findOneBy({slug: query.slug});
     }
 
 
     async deleteProject(currentUserId: number, slug: string): Promise<DeleteResult> {
-        const project = await this.findBySlug(slug);
+        const project = await this.findBySlug({slug});
 
         if (!project) {
             throw new HttpException('Project does not exist', HttpStatus.NOT_FOUND);
@@ -46,7 +48,7 @@ export class ProjectService {
         if (project.authorOfProject.id !== currentUserId) {
             throw new HttpException('You are not an author', HttpStatus.FORBIDDEN);
         }
-        return await this.projectRepository.delete({ slug })
+        return await this.projectRepository.delete({slug})
     }
 
 
@@ -55,7 +57,9 @@ export class ProjectService {
         updateProjectDto: UpdateProjectDto, 
         slug: string): 
     Promise<any> {
-        const project = await this.findBySlug(slug);
+        const project = await this.findBySlug({ 
+            slug
+        });
 
         if (!project) {
             throw new HttpException('Project does not exist', HttpStatus.NOT_FOUND);
@@ -63,7 +67,7 @@ export class ProjectService {
         if (project.authorOfProject.id !== currentUserId) {
             throw new HttpException('You are not an author', HttpStatus.FORBIDDEN);
         }
-        console.log(project)
+
         Object.assign(project, updateProjectDto);
         return await this.projectRepository.save(project);
     }
@@ -99,9 +103,11 @@ export class ProjectService {
     }
 
 
-    async addMember(email: string, slugProject: string): Promise<any> {
+    async addMember(email: string, slug: string): Promise<any> {
         
-        const project = await this.findBySlug(slugProject);
+        const project = await this.findBySlug({
+            slug
+        });
         const member = await this.userRepository.findOneBy({email});
 
         if (!member) {
@@ -116,12 +122,12 @@ export class ProjectService {
     }
 
  
-    async allMembers(slugProject: string): Promise<any> {
+    async allMembers(slug: string): Promise<any> {
         const queryBuilder = AppDataSource
             .getRepository(ProjectEntity)
             .createQueryBuilder('projects')
             .leftJoinAndSelect('projects.membersOfProject', 'members')
-            .where('projects.slug = :slug', { slug: slugProject });
+            .where('projects.slug = :slug', { slug: slug });
         
             //const membersCount = await queryBuilder.getCount();
             const members = await queryBuilder.getOne();
@@ -129,12 +135,12 @@ export class ProjectService {
             return members.membersOfProject;
     }
 
+    /* -------------- AUXILARY -------------- */
 
-    async memeberProject(slug: string): Promise<any> {
-
+    async findBySlug(slug) {
+        return this.projectRepository.findOneBy(slug);
     }
 
-    /* -------------- AUXILARY -------------- */
 
     buildProjectResponse(project: ProjectEntity) {
         return { project }
